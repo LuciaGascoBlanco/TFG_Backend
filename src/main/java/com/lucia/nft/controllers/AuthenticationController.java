@@ -3,7 +3,7 @@ package com.lucia.nft.controllers;
 import java.net.URI;
 import javax.validation.Valid;
 
-import com.lucia.nft.config.UserAuthenticationProvider;
+import com.lucia.nft.config.AuthProvider.UserAuthenticationProvider;
 import com.lucia.nft.dto.SignUpDto;
 import com.lucia.nft.dto.UserDto;
 import com.lucia.nft.services.UserService;

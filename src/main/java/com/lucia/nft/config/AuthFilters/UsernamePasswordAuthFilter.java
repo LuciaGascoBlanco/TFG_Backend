@@ -1,4 +1,4 @@
-package com.lucia.nft.config;
+package com.lucia.nft.config.AuthFilters;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lucia.nft.config.AuthProvider.UserAuthenticationProvider;
 import com.lucia.nft.dto.CredentialsDto;
 
 import org.springframework.http.HttpMethod;
@@ -16,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class UsernamePasswordAuthFilter extends OncePerRequestFilter {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private final UserAuthenticationProvider userAuthenticationProvider;
 
     public UsernamePasswordAuthFilter(UserAuthenticationProvider userAuthenticationProvider) {

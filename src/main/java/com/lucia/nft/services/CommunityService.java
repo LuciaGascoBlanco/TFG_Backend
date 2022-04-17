@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.lucia.nft.config.IPFSConfig;
+import com.lucia.nft.config.IPFS.IPFSConfig;
 import com.lucia.nft.dto.ImageDto;
 import com.lucia.nft.dto.MessageDto;
 import com.lucia.nft.dto.UserDto;
@@ -95,7 +95,6 @@ public class CommunityService {
     }
 
     public List<ImageDto> getGallery(UserDto userDto, int page) throws IOException {
-        //Page<Image> images = imageRepository.findAll(PageRequest.of(page, PAGE_SIZE));
         List<Image> images = imageRepository.findAll();
 
         List<ImageDto> imageDtoList = new ArrayList<>();
@@ -193,13 +192,39 @@ public class CommunityService {
           
         return imageDtoList;
     } 
+
+    public List<ImageDto> deleteImage2(UserDto userDto, String hash, int page) throws IOException {
+        User user = getUser(userDto);
+        List<Long> friendIds = Optional.of(user.getFriends()).map(friends -> friends.stream().map(User::getId).collect(Collectors.toList())).orElse(Collections.emptyList());
+        friendIds.add(user.getId());
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        Image image0 = imageRepository.findImage(hash);
+        imageRepository.delete(image0);
+
+        List<Image> images = imageRepository.findCommunityImages(friendIds, PageRequest.of(page, PAGE_SIZE));
+        images.forEach(image -> {
+            try{
+                IPFS ipfs = ipfsConfig.ipfs;
+                Multihash filePointer = Multihash.fromBase58(hash);
+                byte[] fileContents = ipfs.cat(filePointer);
+                String encoded = Base64.encodeBase64String(fileContents);
+           
+                image.setPath(encoded);
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+
+           } catch (IOException e) {}
+        });
+          
+        return imageDtoList;
+    } 
     
     public List<ImageDto> getSold(UserDto userDto) throws IOException {
         User user = getUser(userDto);
         Long id = user.getId();
 
         List<ImageDto> imageDtoList = new ArrayList<>();
-        List<Image> images = imageRepository.findSold(id);
+        List<Sold> images = soldRepository.findSold(id);
         
         images.forEach(image -> {
             try{
@@ -223,9 +248,12 @@ public class CommunityService {
 
         Sold sold = new Sold();
         sold.setId(user.getId());
-        sold.setImage(image0);
-        sold.setHash(hash);
+        sold.setTitle(image0.getTitle());
+        sold.setPrice(image0.getPrice());
         sold.setUser(user);
+        sold.setPath(image0.getPath());
+        sold.setHash(hash);
+        sold.setCreatedDate(image0.getCreatedDate());
 
         soldRepository.save(sold);
 

@@ -2,7 +2,6 @@ package com.lucia.nft.entities;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -11,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -55,9 +53,6 @@ public class Image {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "image")
-    private Sold sold;
-
     @CreatedDate
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
@@ -66,14 +61,13 @@ public class Image {
         super();
     }
 
-    public Image(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, User user, Sold sold, LocalDateTime createdDate) {
+    public Image(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, User user, LocalDateTime createdDate) {
         this.id = id;
         this.title = title;
         this.price = price;
         this.path = path;
         this.hash = hash;
         this.user = user;
-        this.sold = sold;
         this.createdDate = createdDate;
     }
 
@@ -123,14 +117,6 @@ public class Image {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Sold getSold() {
-        return this.sold;
-    }
-
-    public void setSold(Sold sold) {
-        this.sold = sold;
     }
 
     public LocalDateTime getCreatedDate() {

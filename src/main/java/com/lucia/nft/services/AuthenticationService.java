@@ -29,7 +29,7 @@ public class AuthenticationService {
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return new UserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getLogin());
         }
-        throw new RuntimeException("Invalid password");
+        throw new RuntimeException("Contraseña incorrecta");
     }
 
     public UserDto findByLogin(String login) {

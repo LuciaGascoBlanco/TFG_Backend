@@ -39,7 +39,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.getLogin());
 
         if (optionalUser.isPresent()) {
-            throw new RuntimeException("Login already exists");
+            throw new RuntimeException("El usuario ya existe");
         }
 
         User user = new User(null, userDto.getFirstName(), userDto.getLastName(), userDto.getLogin(), passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())), null, null, null, null, LocalDateTime.now());

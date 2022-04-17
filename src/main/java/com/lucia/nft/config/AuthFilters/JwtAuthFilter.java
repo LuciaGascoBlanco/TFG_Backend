@@ -1,10 +1,12 @@
-package com.lucia.nft.config;
+package com.lucia.nft.config.AuthFilters;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.lucia.nft.config.AuthProvider.UserAuthenticationProvider;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +29,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (authElements.length == 2 && "Bearer".equals(authElements[0])) {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(userAuthenticationProvider.validateToken(authElements[1]));
+                    SecurityContextHolder.getContext().setAuthentication(userAuthenticationProvider.validateToken(authElements[1]));  //validateToken devuelve un UsernamePasswordAuthenticationToken
                 } catch (RuntimeException e) {
                     SecurityContextHolder.clearContext();
                     throw e;

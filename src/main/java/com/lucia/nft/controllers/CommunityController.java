@@ -30,6 +30,8 @@ public class CommunityController {
         this.communityService = communityService;
     }
 
+    //MESSAGES
+
     @GetMapping("/messages")
     public ResponseEntity<List<MessageDto>> getCommunityMessages(@AuthenticationPrincipal UserDto user, @RequestParam(value = "page", defaultValue = "0") int page) {
         return ResponseEntity.ok(communityService.getCommunityMessages(user, page));
@@ -39,6 +41,8 @@ public class CommunityController {
     public ResponseEntity<MessageDto> postMessage(@AuthenticationPrincipal UserDto user, @RequestBody MessageDto messageDto) {
         return ResponseEntity.created(URI.create("/v1/community/messages")).body(communityService.postMessage(user, messageDto));
     }
+
+    //IMAGES
 
     @GetMapping("/images")
     public ResponseEntity<List<ImageDto>> getCommunityImages(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "page", defaultValue = "0") int page) throws IOException {
@@ -50,15 +54,26 @@ public class CommunityController {
         return ResponseEntity.created(URI.create("/v1/community/images")).body(communityService.postImage(userDto, file, title, price));
     }
 
+    //DELETE
+
     @DeleteMapping("/delete")
     public ResponseEntity<List<ImageDto>> deleteCommunityImages(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "page", defaultValue = "0") int page) throws IOException {
         return ResponseEntity.ok(communityService.deleteImage(userDto, page));
     }
 
+    @DeleteMapping("/delete2")
+    public ResponseEntity<List<ImageDto>> deleteCommunityImages2(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash, @RequestParam(value = "page", defaultValue = "0") int page) throws IOException {
+        return ResponseEntity.ok(communityService.deleteImage2(userDto, hash, page));
+    }
+
+    //GALLERY
+
     @GetMapping("/gallery")
     public ResponseEntity<List<ImageDto>> getGallery(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "page", defaultValue = "0") int page) throws IOException {
         return ResponseEntity.ok(communityService.getGallery(userDto, page));
     }
+
+    //SOLD
 
     @GetMapping("/imageSold")
     public ResponseEntity<List<ImageDto>> getSold(@AuthenticationPrincipal UserDto userDto) throws IOException {

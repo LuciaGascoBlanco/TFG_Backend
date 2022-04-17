@@ -1,4 +1,4 @@
-package com.lucia.nft.config;
+package com.lucia.nft.config.AuthProvider;
 
 import java.util.Base64;
 import java.util.Collections;
@@ -32,11 +32,18 @@ public class UserAuthenticationProvider {
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());    // this is to avoid having the raw secret key available in the JVM
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());    //this is to avoid having the raw secret key available in the JVM
     }
 
+    /*CLAIMS:
+
+    “sub”: es el asunto, que coincide con el identificador la persona que se identifica.
+    “exp”: la hora de expiración, a partir de la cual, el token no será válido.  
+    
+    */
+
     public String createToken(String login) {
-        Claims claims = Jwts.claims().setSubject(login);
+        Claims claims = Jwts.claims().setSubject(login);  //“sub”
         Date now = new Date();
 
         return Jwts.builder()
@@ -47,7 +54,7 @@ public class UserAuthenticationProvider {
     }
    
     public Authentication validateToken(String token) {
-        Jwts.builder().setExpiration(null);
+        Jwts.builder().setExpiration(null);             //"exp"
 
         String login = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
 

@@ -1,4 +1,4 @@
-package com.lucia.nft.config;
+package com.lucia.nft.config.Cors;
 
 import java.util.Arrays;
 

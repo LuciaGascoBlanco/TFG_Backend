@@ -1,5 +1,10 @@
 package com.lucia.nft.config;
 
+import com.lucia.nft.config.AuthFilters.JwtAuthFilter;
+import com.lucia.nft.config.AuthFilters.UsernamePasswordAuthFilter;
+import com.lucia.nft.config.AuthProvider.UserAuthenticationProvider;
+import com.lucia.nft.config.Errors.UserAuthenticationEntryPoint;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,16 +26,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .exceptionHandling().authenticationEntryPoint(userAuthenticationEntryPoint)
-                .and()
-                .addFilterBefore(new UsernamePasswordAuthFilter(userAuthenticationProvider), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthFilter(userAuthenticationProvider), UsernamePasswordAuthFilter.class)
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/v1/signIn", "/v1/signUp").permitAll()
-                .anyRequest().authenticated();
+            .exceptionHandling().authenticationEntryPoint(userAuthenticationEntryPoint)
+            .and()
+            .addFilterBefore(new UsernamePasswordAuthFilter(userAuthenticationProvider), BasicAuthenticationFilter.class)
+            .addFilterBefore(new JwtAuthFilter(userAuthenticationProvider), UsernamePasswordAuthFilter.class)
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers(HttpMethod.POST, "/v1/signIn", "/v1/signUp").permitAll()
+            .anyRequest().authenticated();
     }
-
 }

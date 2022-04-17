@@ -1,5 +1,7 @@
 package com.lucia.nft.entities;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -7,14 +9,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -22,7 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "sold")
 public class Sold {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceImageGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceSoldGenerator")
     @GenericGenerator(
             name = "sequenceSoldGenerator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
@@ -35,9 +36,16 @@ public class Sold {
     )
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private Image image;
+    @Column(nullable = false)
+    @Size(max = 100)
+    private String title;
+
+    @Column(nullable = false)
+    @Size(max = 100)
+    private String price;
+
+    @Column(nullable = false)  
+    private String path;
 
     @Column(nullable = false)  
     private String hash;
@@ -45,15 +53,22 @@ public class Sold {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @CreatedDate
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
+
     public Sold() {
         super();
     }
 
-    public Sold(Long id, Image image, String hash, User user) {
+    public Sold(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, User user, LocalDateTime createdDate) {
         this.id = id;
-        this.image = image;
+        this.title = title;
+        this.price = price;
+        this.path = path;
         this.hash = hash;
         this.user = user;
+        this.createdDate = createdDate;
     }
 
     public Long getId() {
@@ -64,12 +79,28 @@ public class Sold {
         this.id = id;
     }
 
-    public Image getImage() {
-        return this.image;
+    public String getTitle() {
+        return this.title;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPrice() {
+        return this.price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getHash() {
@@ -86,6 +117,14 @@ public class Sold {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return this.createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 }
 

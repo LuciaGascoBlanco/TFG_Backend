@@ -1,4 +1,4 @@
-package com.lucia.nft.config;
+package com.lucia.nft.config.IPFS;
 
 import io.ipfs.api.IPFS;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

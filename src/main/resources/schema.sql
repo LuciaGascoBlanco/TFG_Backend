@@ -34,8 +34,11 @@ create sequence if not exists image_sequence start 1000 increment 1;
 
 create table if not exists sold (
     id bigserial primary key,
+    title varchar(100) not null,
+    price varchar(100) not null,
+    path text,
     hash text,
-    user_id bigint references social_network_user(id),
-    image_id bigint references image(id)
+    created_date timestamp not null,
+    user_id bigint references social_network_user(id)
 );
 create sequence if not exists sold_sequence start 1000 increment 1;
