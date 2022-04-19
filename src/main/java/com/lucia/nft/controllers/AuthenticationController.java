@@ -1,12 +1,11 @@
 package com.lucia.nft.controllers;
 
-import java.net.URI;
 import javax.validation.Valid;
 
 import com.lucia.nft.config.AuthProvider.UserAuthenticationProvider;
 import com.lucia.nft.dto.SignUpDto;
 import com.lucia.nft.dto.UserDto;
-import com.lucia.nft.services.UserService;
+import com.lucia.nft.services.AuthenticationService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 public class AuthenticationController {
 
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
     private final UserAuthenticationProvider userAuthenticationProvider;
 
-    public AuthenticationController(UserService userService, UserAuthenticationProvider userAuthenticationProvider) {
-        this.userService = userService;
+    public AuthenticationController(AuthenticationService authenticationService, UserAuthenticationProvider userAuthenticationProvider) {
+        this.authenticationService = authenticationService;
         this.userAuthenticationProvider = userAuthenticationProvider;
     }
 
@@ -36,8 +35,8 @@ public class AuthenticationController {
 
     @PostMapping("/signUp")
     public ResponseEntity<UserDto> signUp(@RequestBody @Valid SignUpDto user) {
-        UserDto createdUser = userService.signUp(user);
-        return ResponseEntity.created(URI.create("/users/" + createdUser.getId() + "/profile")).body(createdUser);
+        UserDto createdUser = authenticationService.signUp(user);
+        return ResponseEntity.ok(createdUser);
     }
 
     @PostMapping("/signOut")

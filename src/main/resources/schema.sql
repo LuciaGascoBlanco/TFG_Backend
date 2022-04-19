@@ -1,4 +1,4 @@
-create table if not exists social_network_user (
+create table if not exists c_user (
     id bigserial primary key,
     first_name varchar(100),
     last_name varchar(100),
@@ -6,20 +6,15 @@ create table if not exists social_network_user (
     password varchar(100),
     created_date timestamp
 );
-create sequence if not exists social_network_user_sequence start 1000 increment 1;
+create sequence if not exists c_user_sequence start 1000 increment 1;
 
 create table if not exists message (
     id bigserial primary key,
     content text,
     created_date timestamp,
-    user_id bigint references social_network_user(id)
+    user_id bigint references c_user(id)
 );
 create sequence if not exists message_sequence start 1000 increment 1;
-
-create table if not exists friends (
-    user_id bigint not null references social_network_user(id),
-    friend_id bigint not null references social_network_user(id)
-);
 
 create table if not exists image (
     id bigserial primary key,
@@ -28,7 +23,7 @@ create table if not exists image (
     path text,
     hash text,
     created_date timestamp not null,
-    user_id bigint references social_network_user(id)
+    user_id bigint references c_user(id)
 );
 create sequence if not exists image_sequence start 1000 increment 1;
 
@@ -39,6 +34,6 @@ create table if not exists sold (
     path text,
     hash text,
     created_date timestamp not null,
-    user_id bigint references social_network_user(id)
+    user_id bigint references c_user(id)
 );
 create sequence if not exists sold_sequence start 1000 increment 1;

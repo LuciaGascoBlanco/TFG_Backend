@@ -54,8 +54,6 @@ public class UserAuthenticationProvider {
     }
    
     public Authentication validateToken(String token) {
-        Jwts.builder().setExpiration(null);             //"exp"
-
         String login = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
 
         UserDto user = authenticationService.findByLogin(login);

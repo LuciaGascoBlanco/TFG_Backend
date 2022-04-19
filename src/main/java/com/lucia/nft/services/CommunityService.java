@@ -5,10 +5,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.lucia.nft.config.IPFS.IPFSConfig;
 import com.lucia.nft.dto.ImageDto;
@@ -25,7 +22,6 @@ import com.lucia.nft.repositories.SoldRepository;
 import com.lucia.nft.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +34,6 @@ import io.ipfs.multihash.Multihash;
 @Service
 public class CommunityService {
 
-    private static final int PAGE_SIZE = 10;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
@@ -55,66 +50,17 @@ public class CommunityService {
         this.soldRepository = soldRepository;
     }
 
-    public List<MessageDto> getCommunityMessages(UserDto userDto, int page) {
-        User user = getUser(userDto);
-        List<Long> friendIds = Optional.of(user.getFriends()).map(friends -> friends.stream().map(User::getId).collect(Collectors.toList())).orElse(Collections.emptyList());
-        friendIds.add(user.getId());
+    //-------------------MESSAGES-----------------------//
 
-        List<Message> messages = messageRepository.findCommunityMessages(friendIds, PageRequest.of(page, PAGE_SIZE));
+    public List<MessageDto> getMessages(UserDto userDto) {
+        User user = getUser(userDto);
+
+        List<Message> messages = messageRepository.findMessages(user.getId());
         List<MessageDto> messageDtoList = new ArrayList<>();
         
         messages.forEach(message -> messageDtoList.add(new MessageDto(message.getId(), message.getContent(), new UserSummaryDto(message.getUser().getId(), message.getUser().getFirstName(), message.getUser().getLastName()), message.getCreatedDate())));
 
         return messageDtoList;
-    }
-
-    public List<ImageDto> getCommunityImages(UserDto userDto, int page) throws IOException {
-        User user = getUser(userDto);
-        List<Long> friendIds = Optional.of(user.getFriends()).map(friends -> friends.stream().map(User::getId).collect(Collectors.toList())).orElse(Collections.emptyList());
-        friendIds.add(user.getId());
-
-        List<ImageDto> imageDtoList = new ArrayList<>();
-
-        List<Image> images = imageRepository.findCommunityImages(friendIds, PageRequest.of(page, PAGE_SIZE));
-        images.forEach(image -> {
-            try{
-                hash = image.getHash();
-
-                IPFS ipfs = ipfsConfig.ipfs;
-                Multihash filePointer = Multihash.fromBase58(hash);
-                byte[] fileContents = ipfs.cat(filePointer);
-                String encoded = Base64.encodeBase64String(fileContents);
-           
-                image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
-
-           } catch (IOException e) {}
-        });
-          
-        return imageDtoList;
-    }
-
-    public List<ImageDto> getGallery(UserDto userDto, int page) throws IOException {
-        List<Image> images = imageRepository.findAll();
-
-        List<ImageDto> imageDtoList = new ArrayList<>();
-
-        images.forEach(image -> {
-            try{
-                hash = image.getHash();
-
-                IPFS ipfs = ipfsConfig.ipfs;
-                Multihash filePointer = Multihash.fromBase58(hash);
-                byte[] fileContents = ipfs.cat(filePointer);
-                String encoded = Base64.encodeBase64String(fileContents);
-           
-                image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
-
-           } catch (IOException e) {}
-        });
-          
-        return imageDtoList;
     }
 
     public MessageDto postMessage(UserDto userDto, MessageDto messageDto) {
@@ -133,6 +79,32 @@ public class CommunityService {
         Message savedMessage = messageRepository.save(message);
 
         return new MessageDto(savedMessage.getId(), savedMessage.getContent(), new UserSummaryDto(savedMessage.getUser().getId(), savedMessage.getUser().getFirstName(), savedMessage.getUser().getLastName()), savedMessage.getCreatedDate());
+    }
+
+    //-------------------IMAGES-----------------------//
+
+    public List<ImageDto> getImages(UserDto userDto) throws IOException {
+        User user = getUser(userDto);
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        List<Image> images = imageRepository.findImages(user.getId());
+
+        images.forEach(image -> {
+            try{
+                hash = image.getHash();
+
+                IPFS ipfs = ipfsConfig.ipfs;
+                Multihash filePointer = Multihash.fromBase58(hash);
+                byte[] fileContents = ipfs.cat(filePointer);
+                String encoded = Base64.encodeBase64String(fileContents);
+           
+                image.setPath(encoded);
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+
+           } catch (IOException e) {}
+        });
+          
+        return imageDtoList;
     }
 
     public ImageDto postImage(UserDto userDto, MultipartFile file, String title, String price) throws IOException {
@@ -164,17 +136,17 @@ public class CommunityService {
         return new ImageDto(image.getId(), image.getTitle(), image.getPrice(), null, image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate());      
     }
 
-    public List<ImageDto> deleteImage(UserDto userDto, int page) throws IOException {
+    //-------------------DELETE-----------------------//
+
+    public List<ImageDto> deleteImage(UserDto userDto) throws IOException {
         User user = getUser(userDto);
-        List<Long> friendIds = Optional.of(user.getFriends()).map(friends -> friends.stream().map(User::getId).collect(Collectors.toList())).orElse(Collections.emptyList());
-        friendIds.add(user.getId());
 
         List<ImageDto> imageDtoList = new ArrayList<>();
 
-        List<Image> images0 = imageRepository.findCommunityImages(friendIds, PageRequest.of(page, PAGE_SIZE));
+        List<Image> images0 = imageRepository.findImages(user.getId());
         imageRepository.delete(images0.get(0));
 
-        List<Image> images = imageRepository.findCommunityImages(friendIds, PageRequest.of(page, PAGE_SIZE));
+        List<Image> images = imageRepository.findImages(user.getId());
         images.forEach(image -> {
             try{
                 hash = image.getHash();
@@ -193,16 +165,14 @@ public class CommunityService {
         return imageDtoList;
     } 
 
-    public List<ImageDto> deleteImage2(UserDto userDto, String hash, int page) throws IOException {
+    public List<ImageDto> deleteImage2(UserDto userDto, String hash) throws IOException {
         User user = getUser(userDto);
-        List<Long> friendIds = Optional.of(user.getFriends()).map(friends -> friends.stream().map(User::getId).collect(Collectors.toList())).orElse(Collections.emptyList());
-        friendIds.add(user.getId());
 
         List<ImageDto> imageDtoList = new ArrayList<>();
         Image image0 = imageRepository.findImage(hash);
         imageRepository.delete(image0);
 
-        List<Image> images = imageRepository.findCommunityImages(friendIds, PageRequest.of(page, PAGE_SIZE));
+        List<Image> images = imageRepository.findImages(user.getId());
         images.forEach(image -> {
             try{
                 IPFS ipfs = ipfsConfig.ipfs;
@@ -218,6 +188,33 @@ public class CommunityService {
           
         return imageDtoList;
     } 
+
+    //-------------------GALLERY-----------------------//
+
+    public List<ImageDto> getGallery(UserDto userDto) throws IOException {
+        List<Image> images = imageRepository.findAll();
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+
+        images.forEach(image -> {
+            try{
+                hash = image.getHash();
+
+                IPFS ipfs = ipfsConfig.ipfs;
+                Multihash filePointer = Multihash.fromBase58(hash);
+                byte[] fileContents = ipfs.cat(filePointer);
+                String encoded = Base64.encodeBase64String(fileContents);
+           
+                image.setPath(encoded);
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+
+           } catch (IOException e) {}
+        });
+          
+        return imageDtoList;
+    }
+
+    //-------------------SOLD-----------------------//
     
     public List<ImageDto> getSold(UserDto userDto) throws IOException {
         User user = getUser(userDto);
@@ -261,7 +258,9 @@ public class CommunityService {
         return imageDtoList;
     }
 
-    private User getUser(UserDto userDto) {
+    //-------------------USER-----------------------//
+
+    public User getUser(UserDto userDto) {
         return userRepository.findById(userDto.getId()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

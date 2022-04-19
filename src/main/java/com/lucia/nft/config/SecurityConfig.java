@@ -28,13 +28,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .exceptionHandling().authenticationEntryPoint(userAuthenticationEntryPoint)
             .and()
-            .addFilterBefore(new UsernamePasswordAuthFilter(userAuthenticationProvider), BasicAuthenticationFilter.class)
-            .addFilterBefore(new JwtAuthFilter(userAuthenticationProvider), UsernamePasswordAuthFilter.class)
+            .addFilterBefore(new UsernamePasswordAuthFilter(userAuthenticationProvider), BasicAuthenticationFilter.class)  //Antes de controlador
+            .addFilterBefore(new JwtAuthFilter(userAuthenticationProvider), UsernamePasswordAuthFilter.class)              //Antes de controlador
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .authorizeRequests()
-            .antMatchers(HttpMethod.POST, "/v1/signIn", "/v1/signUp").permitAll()
+            .authorizeRequests().antMatchers(HttpMethod.POST, "/v1/signIn", "/v1/signUp").permitAll()
             .anyRequest().authenticated();
     }
 }

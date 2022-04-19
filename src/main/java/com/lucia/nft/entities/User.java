@@ -9,8 +9,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,7 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "social_network_user")
+@Table(name = "c_user")
 public class User {
 
     @Id
@@ -32,7 +30,7 @@ public class User {
             name = "sequenceUserGenerator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
             parameters = {
-                    @Parameter(name = "sequence_name", value = "social_network_user_sequence"),
+                    @Parameter(name = "sequence_name", value = "c_user_sequence"),
                     @Parameter(name = "initial_value", value = "1000"),
                     @Parameter(name = "increment_size", value = "1")
             }
@@ -59,14 +57,6 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<Message> messages;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "friends",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id")
-    )
-    private List<User> friends;
-
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private List<Image> images;
@@ -83,14 +73,13 @@ public class User {
         super();
     }
 
-    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<User> friends, List<Image> images, List<Sold> sold, LocalDateTime createdDate) {
+    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<Image> images, List<Sold> sold, LocalDateTime createdDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.login = login;
         this.password = password;
         this.messages = messages;
-        this.friends =friends;
         this.images = images;
         this.sold = sold;
         this.createdDate = createdDate;
@@ -150,14 +139,6 @@ public class User {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
-    }
-
-    public List<User> getFriends() {
-        return this.friends;
-    }
-
-    public void setFriends(List<User> friends) {
-        this.friends = friends;
     }
 
     public List<Image> getImages() {
