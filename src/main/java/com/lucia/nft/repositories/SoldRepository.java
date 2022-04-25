@@ -14,4 +14,7 @@ public interface SoldRepository extends JpaRepository<Sold, Long> {
 
     @Query(value = "SELECT s FROM Sold s WHERE s.user.id IN :id ORDER BY s.createdDate DESC")
     List<Sold> findSold(@Param("id") Long id);
+
+    @Query(value = "SELECT s FROM Sold s WHERE s.hash LIKE :hash")
+    Sold findImage(@Param("hash") String hash);
 }

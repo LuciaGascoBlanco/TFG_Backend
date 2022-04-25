@@ -50,6 +50,9 @@ public class Sold {
     @Column(nullable = false)  
     private String hash;
 
+    @Column(nullable = false)  
+    private String c_like;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
@@ -61,12 +64,13 @@ public class Sold {
         super();
     }
 
-    public Sold(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, User user, LocalDateTime createdDate) {
+    public Sold(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, String c_like, User user, LocalDateTime createdDate) {
         this.id = id;
         this.title = title;
         this.price = price;
         this.path = path;
         this.hash = hash;
+        this.c_like = c_like;
         this.user = user;
         this.createdDate = createdDate;
     }
@@ -109,6 +113,14 @@ public class Sold {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public String getLike() {
+        return this.c_like;
+    }
+
+    public void setLike(String c_like) {
+        this.c_like = c_like;
     }
 
     public User getUser() {

@@ -99,7 +99,7 @@ public class CommunityService {
                 String encoded = Base64.encodeBase64String(fileContents);
            
                 image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), null, new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
 
            } catch (IOException e) {}
         });
@@ -133,7 +133,7 @@ public class CommunityService {
         user.getImages().add(image);
         userRepository.save(user);
 
-        return new ImageDto(image.getId(), image.getTitle(), image.getPrice(), null, image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate());      
+        return new ImageDto(image.getId(), image.getTitle(), image.getPrice(), null, image.getHash(), null, new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate());      
     }
 
     //-------------------DELETE-----------------------//
@@ -157,7 +157,7 @@ public class CommunityService {
                 String encoded = Base64.encodeBase64String(fileContents);
            
                 image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), null, new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
 
            } catch (IOException e) {}
         });
@@ -181,7 +181,7 @@ public class CommunityService {
                 String encoded = Base64.encodeBase64String(fileContents);
            
                 image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), null, new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
 
            } catch (IOException e) {}
         });
@@ -206,7 +206,7 @@ public class CommunityService {
                 String encoded = Base64.encodeBase64String(fileContents);
            
                 image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), null, new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
 
            } catch (IOException e) {}
         });
@@ -231,7 +231,7 @@ public class CommunityService {
                 String encoded = Base64.encodeBase64String(fileContents);
            
                 image.setPath(encoded);
-                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+                imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), image.getLike(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
 
            } catch (IOException e) {}
         });
@@ -250,9 +250,58 @@ public class CommunityService {
         sold.setUser(user);
         sold.setPath(image0.getPath());
         sold.setHash(hash);
+        sold.setLike("false");
         sold.setCreatedDate(image0.getCreatedDate());
 
         soldRepository.save(sold);
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        return imageDtoList;
+    }
+
+    //-------------------FAVORITES-----------------------//
+
+    public List<ImageDto> getLikes(UserDto userDto) throws IOException {
+        User user = getUser(userDto);
+        Long id = user.getId();
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        List<Sold> images = soldRepository.findSold(id);
+        
+        images.forEach(image -> {
+
+            if(image.getLike().equals("true")){
+                try{
+                    IPFS ipfs = ipfsConfig.ipfs;
+                    Multihash filePointer = Multihash.fromBase58(image.getHash());
+                    byte[] fileContents = ipfs.cat(filePointer);
+                    String encoded = Base64.encodeBase64String(fileContents);
+            
+                    image.setPath(encoded);
+                    imageDtoList.add(new ImageDto(image.getId(), image.getTitle(), image.getPrice(), image.getPath(), image.getHash(), image.getLike(), new UserSummaryDto(image.getUser().getId(), image.getUser().getFirstName(), image.getUser().getLastName()) , image.getCreatedDate()));
+
+            } catch (IOException e) {}
+        }
+        });
+
+        return imageDtoList;
+    }
+    
+    public List<ImageDto> postLike(UserDto userDto, String hash) throws IOException {
+        Sold soldImage = soldRepository.findImage(hash);
+        soldImage.setLike("true");
+
+        soldRepository.save(soldImage);
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        return imageDtoList;
+    }
+
+    public List<ImageDto> postDislike(UserDto userDto, String hash) throws IOException {
+        Sold soldImage = soldRepository.findImage(hash);
+        soldImage.setLike("false");
+
+        soldRepository.save(soldImage);
 
         List<ImageDto> imageDtoList = new ArrayList<>();
         return imageDtoList;

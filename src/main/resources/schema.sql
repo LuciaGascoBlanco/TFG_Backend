@@ -33,6 +33,7 @@ create table if not exists sold (
     price varchar(100) not null,
     path text,
     hash text,
+    c_like text,
     created_date timestamp not null,
     user_id bigint references c_user(id)
 );

@@ -84,11 +84,27 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.postSold(userDto, hash));
     }
 
+    //FAVORITES
+
+    @GetMapping("/likes")
+    public ResponseEntity<List<ImageDto>> getLikes(@AuthenticationPrincipal UserDto userDto) throws IOException {
+        return ResponseEntity.ok(communityService.getLikes(userDto));
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<List<ImageDto>> postLike(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash) throws IOException {
+        return ResponseEntity.ok(communityService.postLike(userDto, hash));
+    }
+
+    @PostMapping("/dislike")
+    public ResponseEntity<List<ImageDto>> postDislike(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash) throws IOException {
+        return ResponseEntity.ok(communityService.postDislike(userDto, hash));
+    }
+
     //USER
 
     @GetMapping("/user")
     public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal UserDto userDto) {
         return ResponseEntity.ok(userDto);
     }
-
 }

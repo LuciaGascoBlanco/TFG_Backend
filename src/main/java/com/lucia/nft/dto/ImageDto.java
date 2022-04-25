@@ -10,6 +10,7 @@ public class ImageDto {
     private String price;
     private String path;
     private String hash;
+    private String like;
     private UserSummaryDto userDto;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
@@ -19,12 +20,13 @@ public class ImageDto {
         super();
     }
 
-    public ImageDto(Long id, String title, String price, String path, String hash, UserSummaryDto userDto, LocalDateTime createdDate) {
+    public ImageDto(Long id, String title, String price, String path, String hash, String like, UserSummaryDto userDto, LocalDateTime createdDate) {
         this.id = id;
         this.title = title;
         this.price = price;
         this.path = path;
         this.hash = hash;
+        this.like = like;
         this.userDto = userDto;
         this.createdDate = createdDate;
     }
@@ -67,6 +69,14 @@ public class ImageDto {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public String getLike() {
+        return this.like;
+    }
+
+    public void setLike(String like) {
+        this.like = like;
     }
 
     public UserSummaryDto getUserDto() {
