@@ -63,6 +63,10 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
+    private List<Account> accounts;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private List<Sold> sold;
 
     @CreatedDate
@@ -73,7 +77,7 @@ public class User {
         super();
     }
 
-    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<Image> images, List<Sold> sold, LocalDateTime createdDate) {
+    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<Image> images, List<Account> accounts, List<Sold> sold, LocalDateTime createdDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -81,6 +85,7 @@ public class User {
         this.password = password;
         this.messages = messages;
         this.images = images;
+        this.accounts = accounts;
         this.sold = sold;
         this.createdDate = createdDate;
     }
@@ -147,6 +152,14 @@ public class User {
 
     public void setImages(List<Image> images) {
         this.images = images;
+    }
+
+    public List<Account> getAccounts() {
+        return this.accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     public List<Sold> getSold() {

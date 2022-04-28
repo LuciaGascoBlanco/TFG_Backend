@@ -12,10 +12,12 @@ import com.lucia.nft.dto.ImageDto;
 import com.lucia.nft.dto.MessageDto;
 import com.lucia.nft.dto.UserDto;
 import com.lucia.nft.dto.UserSummaryDto;
+import com.lucia.nft.entities.Account;
 import com.lucia.nft.entities.Image;
 import com.lucia.nft.entities.Message;
 import com.lucia.nft.entities.Sold;
 import com.lucia.nft.entities.User;
+import com.lucia.nft.repositories.AccountRepository;
 import com.lucia.nft.repositories.ImageRepository;
 import com.lucia.nft.repositories.MessageRepository;
 import com.lucia.nft.repositories.SoldRepository;
@@ -38,16 +40,18 @@ public class CommunityService {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final SoldRepository soldRepository;
+    private final AccountRepository accountRepository;
     private String hash;
 
     @Autowired
     private IPFSConfig ipfsConfig;
 
-    public CommunityService(MessageRepository messageRepository, UserRepository userRepository, ImageRepository imageRepository, SoldRepository soldRepository) {
+    public CommunityService(MessageRepository messageRepository, UserRepository userRepository, ImageRepository imageRepository, SoldRepository soldRepository, AccountRepository accountRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.imageRepository = imageRepository;
         this.soldRepository = soldRepository;
+        this.accountRepository = accountRepository;
     }
 
     //-------------------MESSAGES-----------------------//
@@ -311,5 +315,58 @@ public class CommunityService {
 
     public User getUser(UserDto userDto) {
         return userRepository.findById(userDto.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+     //-------------------ACCOUNTS-----------------------//
+
+    public String getAccountMinter(UserDto userDto, String hash) throws IOException {
+        Account account0 = accountRepository.findAccount(hash);
+        String minter = account0.getAccount1();
+        return minter;
+    }
+
+    public String getAccountBuyer(UserDto userDto, String hash) throws IOException {
+        Account account0 = accountRepository.findAccount(hash);
+        String buyer = account0.getAccount2();
+        return buyer;
+    }
+
+    public UserSummaryDto getMinter(UserDto userDto, String hash) throws IOException {
+        Account account0 = accountRepository.findAccount(hash);
+        User minter = account0.getUser();
+        return new UserSummaryDto(minter.getId(), minter.getFirstName(), minter.getLastName());
+    }
+    
+    public UserDto postAccountMinter(UserDto userDto, String hash, String account1) throws IOException {
+        User user = getUser(userDto);
+
+        Account account = new Account();
+        account.setId(user.getId());
+        account.setHash(hash);
+        account.setAccount1(account1);
+        account.setAccount2(null);
+        account.setUser(user);
+
+        accountRepository.save(account);
+
+        return userDto;
+    }
+
+    public List<ImageDto> postAccountBuyer(UserDto userDto, String hash, String account2) throws IOException {
+        User user = getUser(userDto);
+        Account account0 = accountRepository.findAccount(hash);
+
+        Account account = new Account();
+        account.setId(user.getId());
+        account.setHash(hash);
+        account.setAccount1(account0.getAccount1());
+        account.setAccount2(account2);
+        account.setUser(account0.getUser());
+
+        accountRepository.save(account);
+        accountRepository.delete(account0);
+
+        List<ImageDto> imageDtoList = new ArrayList<>();
+        return imageDtoList;
     }
 }

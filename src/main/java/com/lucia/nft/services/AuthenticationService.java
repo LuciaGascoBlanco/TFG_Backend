@@ -33,7 +33,7 @@ public class AuthenticationService {
             throw new RuntimeException("El usuario ya existe");
         }
 
-        User user = new User(null, userDto.getFirstName(), userDto.getLastName(), userDto.getLogin(), passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())), null, null, null, LocalDateTime.now());
+        User user = new User(null, userDto.getFirstName(), userDto.getLastName(), userDto.getLogin(), passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())), null, null, null, null, LocalDateTime.now());
         User savedUser = userRepository.save(user);
 
         return new UserDto(savedUser.getId(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getLogin());
