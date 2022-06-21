@@ -9,7 +9,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
@@ -53,21 +52,17 @@ public class User {
     @Size(max = 100)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")    //Un cambio en el usuario borra, actualiza, etc, los mensajes que dependen de él (CascadeType.ALL)
     private List<Message> messages;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Image> images;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private List<Account> accounts;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userMinter")   
+    private List<Sold> soldMinter;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private List<Sold> sold;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userBuyer")
+    private List<Sold> soldBuyer;
 
     @CreatedDate
     @Column(name = "created_date", nullable = false)
@@ -77,7 +72,7 @@ public class User {
         super();
     }
 
-    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<Image> images, List<Account> accounts, List<Sold> sold, LocalDateTime createdDate) {
+    public User(Long id, @Size(max = 100) String firstName, @Size(max = 100) String lastName, @Size(max = 100) String login, @Size(max = 100) String password, List<Message> messages, List<Image> images, List<Sold> soldMinter, List<Sold> soldBuyer, LocalDateTime createdDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -85,8 +80,8 @@ public class User {
         this.password = password;
         this.messages = messages;
         this.images = images;
-        this.accounts = accounts;
-        this.sold = sold;
+        this.soldMinter = soldMinter;
+        this.soldBuyer = soldBuyer;
         this.createdDate = createdDate;
     }
 
@@ -154,19 +149,19 @@ public class User {
         this.images = images;
     }
 
-    public List<Account> getAccounts() {
-        return this.accounts;
+    public List<Sold> getSoldMinter() {
+        return this.soldMinter;
     }
 
-    public void setAccounts(List<Account> accounts) {
-        this.accounts = accounts;
+    public void setSoldMinter(List<Sold> soldMinter) {
+        this.soldMinter = soldMinter;
     }
 
-    public List<Sold> getSold() {
-        return this.sold;
+    public List<Sold> getSoldBuyer() {
+        return this.soldBuyer;
     }
 
-    public void setSold(List<Sold> sold) {
-        this.sold = sold;
+    public void setSoldBuyer(List<Sold> soldBuyer) {
+        this.soldBuyer = soldBuyer;
     }
 }

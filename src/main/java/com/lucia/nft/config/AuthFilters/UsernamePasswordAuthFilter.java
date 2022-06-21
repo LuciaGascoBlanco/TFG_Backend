@@ -37,6 +37,6 @@ public class UsernamePasswordAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(httpServletRequest, httpServletResponse);          //Pasa al siguiente filtro en la cadena
     }
 }

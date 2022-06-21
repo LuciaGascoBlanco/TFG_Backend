@@ -35,15 +35,7 @@ create table if not exists sold (
     hash text,
     c_like text,
     created_date timestamp not null,
-    user_id bigint references c_user(id)
+    minter bigint references c_user(id),
+    buyer bigint references c_user(id)
 );
 create sequence if not exists sold_sequence start 1000 increment 1;
-
-create table if not exists account (
-    id bigserial primary key,
-    hash text,
-    account1 text,
-    account2 text,
-    user_id bigint references c_user(id)
-);
-create sequence if not exists account_sequence start 1000 increment 1;

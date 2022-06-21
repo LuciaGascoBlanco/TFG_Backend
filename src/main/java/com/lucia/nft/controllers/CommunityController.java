@@ -6,7 +6,6 @@ import java.util.List;
 import com.lucia.nft.dto.ImageDto;
 import com.lucia.nft.dto.MessageDto;
 import com.lucia.nft.dto.UserDto;
-import com.lucia.nft.dto.UserSummaryDto;
 import com.lucia.nft.services.CommunityService;
 
 import org.springframework.http.ResponseEntity;
@@ -107,32 +106,5 @@ public class CommunityController {
     @GetMapping("/user")
     public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal UserDto userDto) {
         return ResponseEntity.ok(userDto);
-    }
-
-    //ACCOUNTS
-
-    @PostMapping("/getAccountMinter")
-    public ResponseEntity<String> getAccountMinter(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash) throws IOException {
-        return ResponseEntity.ok(communityService.getAccountMinter(userDto, hash));
-    }
-
-    @PostMapping("/getAccountBuyer")
-    public ResponseEntity<String> getAccountBuyer(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash) throws IOException {
-        return ResponseEntity.ok(communityService.getAccountBuyer(userDto, hash));
-    }
-
-    @PostMapping("/getMinter")
-    public ResponseEntity<UserSummaryDto> getMinter(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash) throws IOException {
-        return ResponseEntity.ok(communityService.getMinter(userDto, hash));
-    }
-
-    @PostMapping("/accountMinter")
-    public ResponseEntity<UserDto> postAccountMinter(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash, @RequestParam(value = "account1") String account1) throws IOException {
-        return ResponseEntity.ok(communityService.postAccountMinter(userDto, hash, account1));
-    }
-
-    @PostMapping("/accountBuyer")
-    public ResponseEntity<List<ImageDto>> postAccountBuyer(@AuthenticationPrincipal UserDto userDto, @RequestParam(value = "hash") String hash, @RequestParam(value = "account2") String account2) throws IOException {
-        return ResponseEntity.ok(communityService.postAccountBuyer(userDto, hash, account2));
     }
 }

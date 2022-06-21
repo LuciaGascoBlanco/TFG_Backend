@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
@@ -53,8 +54,13 @@ public class Sold {
     @Column(nullable = false)  
     private String c_like;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)          //No quiero descargar todo el user al descargar un sold, solo cuando se haga un get (FetchType.LAZY)
+    @JoinColumn(name = "minter")       
+    private User userMinter;
+
+    @ManyToOne(fetch = FetchType.LAZY)          
+    @JoinColumn(name = "buyer")
+    private User userBuyer;
 
     @CreatedDate
     @Column(name = "created_date", nullable = false)
@@ -64,14 +70,15 @@ public class Sold {
         super();
     }
 
-    public Sold(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, String c_like, User user, LocalDateTime createdDate) {
+    public Sold(Long id, @Size(max = 100) String title, @Size(max = 100) String price, String path, String hash, String c_like, User userMinter, User userBuyer, LocalDateTime createdDate) {
         this.id = id;
         this.title = title;
         this.price = price;
         this.path = path;
         this.hash = hash;
         this.c_like = c_like;
-        this.user = user;
+        this.userMinter = userMinter;
+        this.userBuyer = userBuyer;
         this.createdDate = createdDate;
     }
 
@@ -123,12 +130,20 @@ public class Sold {
         this.c_like = c_like;
     }
 
-    public User getUser() {
-        return this.user;
+    public User getUserMinter() {
+        return this.userMinter;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserMinter(User userMinter) {
+        this.userMinter = userMinter;
+    }
+
+    public User getUserBuyer() {
+        return this.userBuyer;
+    }
+
+    public void setUserBuyer(User userBuyer) {
+        this.userBuyer = userBuyer;
     }
 
     public LocalDateTime getCreatedDate() {
